@@ -1,0 +1,512 @@
+{
+  "name": "FixIt by Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        208
+      ],
+      "id": "e9b97d7d-9581-49f1-b1c6-6af7b6b12c1b",
+      "name": "Telegram Trigger",
+      "webhookId": "4f7cdb71-4d8a-4593-85da-98b8f21f1a01",
+      "credentials": {
+        "telegramApi": {
+          "id": "BL9V1Ewzsj3TSCvP",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Get from the user's input these fields:\n* Store ID\n* Location\n* Product\n\nCheck the history: if any item is missing, ask for it. Return a JSON object with \"complete\"=false and \"reply\" with your question for the user, like this:\n{\n  \"output\":{\"complete\":false, \"reply\": \"Please provide the product\", \"StoreID\":\"NYC034\", \"Location\":\"Strip mall\", \"Product\":null}\n}\nIf you have all items, return a JSON object with 'complete'=true like this:\n{\n  \"output\":{\"complete\":true, \"reply\": null, \"StoreID\":\"NYC034\", \"Location\":\"Strip mall\", \"Product\":\"iPhone case\"}\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -64,
+        -64
+      ],
+      "id": "79087387-ae9f-4d88-a34d-a388ffb2e606",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"complete\": {\n      \"type\": \"boolean\"\n    },\n    \"reply\": {\n      \"type\": \"string\"\n    },\n    \"StoreID\": {\n      \"type\": \"string\"\n    },\n    \"Location\": {\n      \"type\": \"string\"\n    },\n    \"Product\": {\n      \"type\": \"string\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\"complete\", \"reply\", \"StoreID\",\"Location\",\"Product\"]\n}",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        176
+      ],
+      "id": "a44074b3-784e-48b1-bcf4-68e086f22694",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eMIkhuZLTToE43JE",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        176
+      ],
+      "id": "ffcf41d2-7394-43d8-b8e7-372243cb4f18",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a6af61d6-5562-4c81-a2fd-b04272333078",
+              "leftValue": "={{ $json.message.chat.id }}",
+              "rightValue": 1223406456,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        208
+      ],
+      "id": "6c04ed8e-c035-4881-a17e-cad8db969c82",
+      "name": "Validate authorized user"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7be6a57a-839d-4cae-a852-84d6a602fd42",
+              "leftValue": "={{ $json.output.complete }}",
+              "rightValue": "\"complete\": true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        48
+      ],
+      "id": "7fceddfe-cdcc-4727-a41d-e5dc0b57e3b7",
+      "name": "Data is complete?"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ZvmxyPbWnmXC957J",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ZvmxyPbWnmXC957J",
+          "cachedResultName": "Evaluate Product query"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Location": "={{ $json.output.Location }}",
+            "StoreID": "={{ $json.output.StoreID }}",
+            "Product": "={{ $json.output.Product }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "StoreID",
+              "displayName": "StoreID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        -48
+      ],
+      "id": "25ca78d0-d8d5-4ff3-912b-e9bf966d9d59",
+      "name": "Call 'Evaluate Product query'"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Unauthorized user!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        352
+      ],
+      "id": "3b238ec0-661a-4410-9219-7a82110045d3",
+      "name": "Reject user",
+      "webhookId": "dbea7f4c-bd59-4820-b845-187ec734cfa0",
+      "credentials": {
+        "telegramApi": {
+          "id": "BL9V1Ewzsj3TSCvP",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('AI Agent').item.json.output.reply }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        144
+      ],
+      "id": "9fc93beb-5ea5-4b41-810e-114ac0b9d4e8",
+      "name": "Ask for missing data",
+      "webhookId": "f250c983-bd1c-49ba-a777-be56144c5b4a",
+      "credentials": {
+        "telegramApi": {
+          "id": "BL9V1Ewzsj3TSCvP",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d7c71df1-dffc-43ec-8615-106ab7e93e37",
+              "leftValue": "={{ $json.output[0].content[0].text.confidence }}",
+              "rightValue": 0.8,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        -48
+      ],
+      "id": "7dd23924-034d-4251-a1c5-9bca67ce4021",
+      "name": "Check confidence"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=<b>Request received:</b>\n• Store ID: <b>{{ $('AI Agent').item.json.output.StoreID }}</b>\n• Location: <b>{{ $('AI Agent').item.json.output.Location }}</b>\n• Product: <b>{{ $('AI Agent').item.json.output.Product }}</b>\n\n<b>Result of the query:</b>\n• Is compliant: <b>{{ $json.output[0].content[0].text.is_compliant }}</b>\n• Confidence: <b>{{ Number($('Call \\'Evaluate Product query\\'').item.json.output[0].content[0].text.confidence) * 100 }}%</b>\n• Reasoning: <i>{{ $json.output[0].content[0].text.reasoning }}</i>\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        -144
+      ],
+      "id": "ca37c1fd-fe0b-4022-8741-6648e46c9174",
+      "name": "Send answer",
+      "webhookId": "48c9b5f3-03ac-4f46-a049-1715b4bc538a",
+      "credentials": {
+        "telegramApi": {
+          "id": "BL9V1Ewzsj3TSCvP",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=<b>Request received:</b>\n• Store ID: <b>{{ $('AI Agent').item.json.output.StoreID }}</b>\n• Location: <b>{{ $('AI Agent').item.json.output.Location }}</b>\n• Product: <b>{{ $('AI Agent').item.json.output.Product }}</b>\n\nThe automated process is having issues with your query, so it is been routed to a human reviewer.  \n\n• Is compliant: <b>{{ $json.output[0].content[0].text.is_compliant }}</b>\n• Confidence: <b>{{ Number($('Call \\'Evaluate Product query\\'').item.json.output[0].content[0].text.confidence) * 100 }}%</b>\n• Reasoning: <i>{{ $json.output[0].content[0].text.reasoning }}</i>\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        48
+      ],
+      "id": "576a9d62-79c9-4804-8cc1-a9348d4ea566",
+      "name": "Inform routing to human",
+      "webhookId": "48c9b5f3-03ac-4f46-a049-1715b4bc538a",
+      "credentials": {
+        "telegramApi": {
+          "id": "BL9V1Ewzsj3TSCvP",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"complete\": {\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"reply\": {\n\t\t\t\"type\": \"text\"\n\t\t},\n\t\t\"StoreID\": {\n\t\t\t\"type\": \"text\"\n\t\t},\n\t\t\"Location\": {\n\t\t\t\"type\": \"text\"\n\t\t},\n\t\t\"Product\": {\n\t\t\t\"type\": \"text\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        176
+      ],
+      "id": "7815c533-3d93-4eff-8d38-021d3abcf39e",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate authorized user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Data is complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate authorized user": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data is complete?": {
+      "main": [
+        [
+          {
+            "node": "Call 'Evaluate Product query'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ask for missing data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Evaluate Product query'": {
+      "main": [
+        [
+          {
+            "node": "Check confidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reject user": {
+      "main": [
+        []
+      ]
+    },
+    "Check confidence": {
+      "main": [
+        [
+          {
+            "node": "Send answer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inform routing to human",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send answer": {
+      "main": [
+        []
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "318a8255-37ec-4d75-846e-342897b9a716",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "23db569c3cc040d2277ed964d8d4dc5444b8680c302ab1c5bfb0876e3dd87964"
+  },
+  "id": "nG17T2KauWBNs0aOmgUtg",
+  "tags": []
+}

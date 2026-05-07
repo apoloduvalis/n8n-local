@@ -1,0 +1,169 @@
+{
+  "name": "Evaluate Product query",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a compliance assistant. Your job is to evaluate the product submitted by the user strictly according to the policy document provided. \nBe concise, specific, and structured in your response. If the submission violates any policy, in your reasoning state which rule and why. If it is compliant, confirm it clearly.\nIn either case, provide a confidence percentage. For example: the product matched explicitly the policy: 1.0; the product didn't match the policy explicitly but is close enough: 0.8; the product could be considered as part of a category in the policy but more information is required to be sure: 0.5; etc. \nAnswer only with a JSON object with attributes \"is_compliant\" (boolean), \"confidence\" (float) and \"reasoning\" (string)"
+            },
+            {
+              "content": "=POLICY DOCUMENT:{{ $json.data }}\n\nUSER SUBMISSION:\nStore:{{ $('Start').item.json.StoreID }}\nProduct:{{ $('Start').item.json.Product }}\nLocation:{{ $('Start').item.json.Location }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 100,
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_compliant\": {\n      \"type\": \"boolean\"\n    },\n    \"confidence\": {\n      \"type\": \"number\"\n    },\n    \"reasoning\":{\n      \"type\": \"string\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\"is_compliant\", \"confidence\", \"reasoning\"]\n}",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        432,
+        -432
+      ],
+      "id": "a4d1ea56-87c0-4c41-9de3-ba4f72ed1abd",
+      "name": "Evaluate request",
+      "credentials": {
+        "openAiApi": {
+          "id": "eMIkhuZLTToE43JE",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Location"
+            },
+            {
+              "name": "StoreID"
+            },
+            {
+              "name": "Product"
+            }
+          ]
+        }
+      },
+      "id": "c31f14d9-cccf-43a3-8c95-b6e857b3c938",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -240,
+        -432
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "https://drive.google.com/file/d/1LomHyDS7IVlGfBcOXrjtfoHInGhU8Fcz/view?usp=sharing",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        -432
+      ],
+      "id": "9fd2b135-3d8e-4352-aa8a-4db61f0bfc83",
+      "name": "Get policy document",
+      "credentials": {
+        "googleApi": {
+          "id": "Q3eBa2xL7sYCTn38",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -432
+      ],
+      "id": "c4694126-16d6-4394-986a-650495fdf697",
+      "name": "Extract from File"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Evaluate request": {
+      "main": [
+        []
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get policy document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get policy document": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Evaluate request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "f74b80bb-a7de-4837-9771-12db4805021b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "23db569c3cc040d2277ed964d8d4dc5444b8680c302ab1c5bfb0876e3dd87964"
+  },
+  "id": "ZvmxyPbWnmXC957J",
+  "tags": []
+}

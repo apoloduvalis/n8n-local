@@ -1,0 +1,7 @@
+*.log
+.DS_Store
+.env
+binary_data/
+database.sqlite*
+crash.journal
+credentials/*

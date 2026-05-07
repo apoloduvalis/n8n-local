@@ -1,0 +1,249 @@
+{
+  "name": "FixIt by Form",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Enter compliance query",
+        "formDescription": "Input the details of a compliance query about products or store related regulations and get a verdict of approved or rejected with the support from the current policy.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "StoreID",
+              "placeholder": "MIA034, NYC525, LAX002"
+            },
+            {
+              "fieldLabel": "Location",
+              "fieldType": "radio",
+              "defaultValue": "Walmart",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Walmart"
+                  },
+                  {
+                    "option": "Strip Mall"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "QueryType",
+              "fieldType": "radio",
+              "defaultValue": "Product",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Product"
+                  },
+                  {
+                    "option": "Store's setup"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Query",
+              "fieldType": "textarea",
+              "placeholder": "Dog speaker, Apple charger for iPhone, Trump posters"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Get approval",
+          "customCss": ":root {\n\t--font-family: 'Open Sans', sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\t--font-size-body: 12px;\n\t--font-size-label: 14px;\n\t--font-size-test-notice: 12px;\n\t--font-size-input: 14px;\n\t--font-size-header: 20px;\n\t--font-size-paragraph: 14px;\n\t--font-size-link: 12px;\n\t--font-size-error: 12px;\n\t--font-size-html-h1: 28px;\n\t--font-size-html-h2: 20px;\n\t--font-size-html-h3: 16px;\n\t--font-size-html-h4: 14px;\n\t--font-size-html-h5: 12px;\n\t--font-size-html-h6: 10px;\n\t--font-size-subheader: 14px;\n\n\t/* Colors */\n\t--color-background: #fbfcfe;\n\t--color-test-notice-text: #e6a23d;\n\t--color-test-notice-bg: #fefaf6;\n\t--color-test-notice-border: #f6dcb7;\n\t--color-card-bg: #ffffff;\n\t--color-card-border: #dbdfe7;\n\t--color-card-shadow: rgba(99, 77, 255, 0.06);\n\t--color-link: #7e8186;\n\t--color-header: #525356;\n\t--color-label: #555555;\n\t--color-input-border: #dbdfe7;\n\t--color-input-text: #7A717A;\n\t--color-focus-border: rgb(90, 76, 194);\n\t--color-submit-btn-bg: #0000ff;\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ea1f30;\n\t--color-required: #ff6d5a;\n\t--color-clear-button-bg: #7e8186;\n\t--color-html-text: #555;\n\t--color-html-link: #ff6d5a;\n\t--color-header-subtext: #7e8186;\n\n\t/* Border Radii */\n\t--border-radius-card: 8px;\n\t--border-radius-input: 6px;\n\t--border-radius-clear-btn: 50%;\n\t--card-border-radius: 8px;\n\n\t/* Spacing */\n\t--padding-container-top: 24px;\n\t--padding-card: 24px;\n\t--padding-test-notice-vertical: 12px;\n\t--padding-test-notice-horizontal: 24px;\n\t--margin-bottom-card: 16px;\n\t--padding-form-input: 12px;\n\t--card-padding: 24px;\n\t--card-margin-bottom: 16px;\n\n\t/* Dimensions */\n\t--container-width: 448px;\n\t--submit-btn-height: 48px;\n\t--checkbox-size: 18px;\n\n\t/* Others */\n\t--box-shadow-card: 0px 4px 16px 0px var(--color-card-shadow);\n\t--opacity-placeholder: 0.5;\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        96
+      ],
+      "id": "f6b7b0f5-dfc7-4c7b-9fc5-77a05692ab27",
+      "name": "On form submission",
+      "webhookId": "44f7f1d5-2f5d-4985-ada6-0c19b03aaf2b"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ZvmxyPbWnmXC957J",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ZvmxyPbWnmXC957J",
+          "cachedResultName": "Evaluate Product query"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Location": "={{ $('On form submission').item.json.Location }}",
+            "StoreID": "={{ $('On form submission').item.json.StoreID }}",
+            "Product": "={{ $('On form submission').item.json.Query }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "StoreID",
+              "displayName": "StoreID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "name": "Call Evaluate Product query",
+      "id": "0d43d4f4-7aea-4cee-8ce9-4d1ed4c81046"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6c8617d5-89d3-486c-9c82-6116671ae1e5",
+              "leftValue": "={{ $json.QueryType }}",
+              "rightValue": "Product",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        96
+      ],
+      "id": "9730109d-c2d6-4a9f-8e4e-b69f2341a357",
+      "name": "Validate query type"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Not available",
+        "completionMessage": "=Your type of query {{ $('On form submission').item.json.QueryType }} is not available at this time. ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        672,
+        192
+      ],
+      "id": "76c6d86f-1ac4-49c1-a9d4-63e3f06ca70a",
+      "name": "Reply unavailable",
+      "webhookId": "b4a100c2-91fb-41f3-a3b2-880dce0dac60"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Query completed",
+        "completionMessage": "=Request received:\nStore ID: {{ $('Validate query type').item.json.StoreID }}\nLocation: {{ $('Validate query type').item.json.Location }}\nProduct: {{ $('Validate query type').item.json.Query }}\n\nResult of the query:\nIs compliant: {{ $json.output[0].content[0].text.is_compliant }}\nReasoning: {{ $json.output[0].content[0].text.reasoning }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        672,
+        0
+      ],
+      "id": "c447b512-ec9d-4e7d-9182-da833376e987",
+      "name": "Reply approval",
+      "webhookId": "50a1c1ac-d6ad-4bba-81e3-be909bb39e7b"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Validate query type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Evaluate Product query": {
+      "main": [
+        [
+          {
+            "node": "Reply approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate query type": {
+      "main": [
+        [
+          {
+            "node": "Call Evaluate Product query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply unavailable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "9e797bf5-c8bc-4928-a52b-8c4fc9ccc807",
+  "meta": {
+    "instanceId": "23db569c3cc040d2277ed964d8d4dc5444b8680c302ab1c5bfb0876e3dd87964"
+  },
+  "id": "awIAoG18Gc1QsLOvJTGx2",
+  "tags": []
+}
