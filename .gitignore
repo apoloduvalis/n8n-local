@@ -1,7 +1,7 @@
 *.log
 .DS_Store
 .env
-binary_data/
-database.sqlite*
-crash.journal
 credentials/*
+# n8n runtime data: ignore contents, keep folder via whitelist
+n8n_data/*
+!n8n_data/.gitkeep

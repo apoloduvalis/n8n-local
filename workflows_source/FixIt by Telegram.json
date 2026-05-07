@@ -104,7 +104,7 @@
             {
               "id": "a6af61d6-5562-4c81-a2fd-b04272333078",
               "leftValue": "={{ $json.message.chat.id }}",
-              "rightValue": 1223406456,
+              "rightValue": 1234567890,
               "operator": {
                 "type": "number",
                 "operation": "equals"
@@ -497,12 +497,12 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "318a8255-37ec-4d75-846e-342897b9a716",
+  "versionId": "13f68057-ad7e-4538-9f73-7b1c578197a1",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "23db569c3cc040d2277ed964d8d4dc5444b8680c302ab1c5bfb0876e3dd87964"

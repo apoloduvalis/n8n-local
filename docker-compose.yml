@@ -15,7 +15,7 @@ services:
       - N8N_CORS_ALLOWED_ORIGINS=*
       - N8N_PROXY_HOPS=1
     volumes:
-      - /Users/apoloduvalis/Documents/n8n-local:/home/node/.n8n
+      - ./n8n_data:/home/node/.n8n
     networks:
       - n8n-network
     restart: unless-stopped
